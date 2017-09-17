@@ -72,7 +72,7 @@
 							<outputDirectory>${basedir}/target/classes/static/</outputDirectory>
 							<resources>
 								<resource>
-									<directory>${basedir}/../angular/dist</directory>
+									<directory>${basedir}/../webcli/dist</directory>
 								</resource>
 							</resources>
 						</configuration>
