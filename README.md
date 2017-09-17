@@ -26,6 +26,13 @@ Angular installation from scratch:
 - Check on browser:
 	- http://localhost:42100/ 
 
+INSTALL MAVEN and make angular mananged by Maven
+ - mvn archetype:generate -DgroupId=webroot.webcli -DartifactId=webcli -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
+ - cd into src/main/
+ - mkdir resources
+ - mkdir webapp
+ - mkdir ngapp
+ 
 ------ GIT commands usefully ------
 
 Create the branch on your local machine and switch in this branch :
