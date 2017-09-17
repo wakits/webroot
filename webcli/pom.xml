@@ -1,0 +1,48 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+              http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>webroot</groupId>
+  <artifactId>webcli</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+
+	<name>webcli</name>
+	<description>web client project for webroot </description>
+
+  <properties>
+    <maven.exec.version>1.6.0</maven.exec.version>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>${maven.exec.version}</version>
+        <executions>
+          <execution>
+            <id>Compile Angular App</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <executable>ng</executable>
+          <!--<workingDirectory>${basedir}</workingDirectory>-->
+          <arguments>
+            <argument>build</argument>
+            <argument>-prod</argument>
+            <!--<argument>-aot</argumnet>-->
+          </arguments>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
