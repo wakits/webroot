@@ -2,8 +2,16 @@
 
 Angular + Java webApp base
 
-Angular installation from scratch:
-- Install nodejs, com nodejs.com
+#Angular installation from scratch follow by SpringBoot and maven:
+– Java 1.8
+– Maven 3.3.9
+– Spring Tool Suite – Version 3.9.0.RELEASE
+– Spring Boot: RELEASE
+– Angular 4.x
+– Node.js
+
+#NodeJS
+- Install nodejs from nodejs.com it returns:
   - download and install latest version, at the end:
   Node.js was installed at
    /usr/local/bin/node
@@ -13,6 +21,9 @@ Angular installation from scratch:
   Make sure is OK on you console: 
   > $ node -v
   v6.11.3
+
+#Angular and Typescript
+  
 - Install Angular CLI
 	- npm install -g @angular/cli
 - Install Typescript
@@ -26,13 +37,36 @@ Angular installation from scratch:
 - Check on browser:
 	- http://localhost:42100/ 
 
-INSTALL MAVEN and make angular mananged by Maven
- - mvn archetype:generate -DgroupId=webroot.webcli -DartifactId=webcli -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
- - cd into src/main/
- - mkdir resources
- - mkdir webapp
- - mkdir ngapp
- 
+#SpringBoot and Maven
+
+INSTALL Springboot that includes maven too: form https://start.spring.io/
+- It downloads a zip with the content that already includes the pom configuration.
+- Create a Controlle: WebRestController.java mapped to 'api/hi'
+
+#Integrate SpringBoot server and Angular 4 client
+
+– Create a file proxy.conf.json under project angular project root with:
+{
+	"/api": {
+		"target": "http://localhost:8080",
+		"secure": false
+	}
+}
+– Edit package.json file for “start” script and change:
+
+"start": "ng server --proxy-config proxy.conf.json"
+
+- Build angular4 client with command ng build -prod
+> ng build -prod
+will result in the content of the dist folder
+
+- Update maven to copy the result of the dist folder from angular to static resources on springboot check: maven-resources-plugin on pom.xml
+– Build: mvn clean install
+– Run: mvn spring-boot:run
+– Check http://localhost:8080/ and – http://localhost:8080/api/hi
+
+
+
 ------ GIT commands usefully ------
 
 Create the branch on your local machine and switch in this branch :
