@@ -29,12 +29,15 @@ Angular installation from scratch:
 ------ GIT commands usefully ------
 
 Create the branch on your local machine and switch in this branch :
+
 $ git checkout -b [name_of_your_new_branch]
 
 Change working branch :
+
 $ git checkout [name_of_your_new_branch]
 
 Push the branch on github :
+
 $ git push origin [name_of_your_new_branch]
 
 When you want to commit something in your branch, be sure to be in your branch. Add -u parameter to set upstream.
