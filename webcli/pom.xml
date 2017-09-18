@@ -1,0 +1,101 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+              http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>webroot</groupId>
+	<artifactId>webcli</artifactId>
+	<version>1.0</version>
+	<packaging>pom</packaging>
+
+	<name>webcli</name>
+	<description>web client project for webroot </description>
+
+	<properties>
+		<maven.exec.version>1.6.0</maven.exec.version>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>${maven.exec.version}</version>
+				<executions>
+					<execution>
+						<id>Compile Angular App</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<executable>ng</executable>
+					<!--<workingDirectory>${basedir}</workingDirectory> -->
+					<arguments>
+						<argument>build</argument>
+						<argument>-prod</argument>
+						<!--<argument>-aot</argumnet> -->
+					</arguments>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.eirslett</groupId>
+				<artifactId>frontend-maven-plugin</artifactId>
+				<version>1.5</version>
+				<configuration>
+					<nodeVersion>v6.11.3</nodeVersion>
+					<npmVersion>3.10.10</npmVersion>
+					<installDirectory>target</installDirectory>
+					<workingDirectory>${basedir}</workingDirectory>
+				</configuration>
+				<executions>
+					<!-- install node & npm -->
+					<execution>
+						<id>install node and npm</id>
+						<goals>
+							<goal>install-node-and-npm</goal>
+						</goals>
+					</execution>
+
+					<!--npm install -->
+					<execution>
+						<id>npm install</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<configuration>
+							<arguments>install</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+  <plugin>
+    <artifactId>maven-clean-plugin</artifactId>
+    <version>3.0.0</version>
+    <configuration>
+      <filesets>
+        <fileset>
+          <directory>${basedir}/node_modules</directory>
+          <includes>
+            <include>**</include>
+          </includes>
+          <followSymlinks>false</followSymlinks>
+        </fileset>
+        <fileset>
+          <directory>${basedir}/dist</directory>
+          <includes>
+            <include>**</include>
+          </includes>
+          <followSymlinks>false</followSymlinks>
+        </fileset>
+      </filesets>
+    </configuration>
+  </plugin>
+		</plugins>
+	</build>
+
+</project>
