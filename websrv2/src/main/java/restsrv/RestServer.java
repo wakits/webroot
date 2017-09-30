@@ -10,32 +10,37 @@ import io.undertow.server.handlers.resource.ResourceManager;
 
 import java.time.Duration; 
 
+import org.jboss.logging.Logger;
+
 /**
  * RestServer
  */
 public class RestServer {
 
-    static Integer intOrNull(String str) {
+    private static final Logger LOGGER = Logger.getLogger(RestServer.class);
+
+    static Integer intOrNull(String str, String errMsg) {
         if (str == null) return null;
         try {
             return Integer.valueOf(str);
         } catch (NumberFormatException e) {
             // log error
-            // TODO
+            LOGGER.error(errMsg + str);
         }
         return null;
     }
 
     static int serverPort(final String[] args) {
         Integer port;
+        String msg = "Invalid port number: ";
 
         // from env
-        port = intOrNull(System.getenv("PORT"));
+        port = intOrNull(System.getenv("PORT"), msg);
         if (port != null) return port.intValue();
 
         // from args
         if (args.length > 0) {
-            port = intOrNull(args[0]);
+            port = intOrNull(args[0], msg);
             if (port != null) return port.intValue();
         }
 
