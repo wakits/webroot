@@ -75,6 +75,7 @@ public class RestServer {
             .addHttpListener(port, "localhost")
             .setHandler(createStaticResourceHandler())
             .build();
+        LOGGER.info("Starting RestServer @ localhost:" + port);
         server.start();
     }
 }
