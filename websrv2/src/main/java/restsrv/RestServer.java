@@ -15,8 +15,30 @@ import java.time.Duration;
  */
 public class RestServer {
 
+    static Integer intOrNull(String str) {
+        if (str == null) return null;
+        try {
+            return Integer.valueOf(str);
+        } catch (NumberFormatException e) {
+            // log error
+            // TODO
+        }
+        return null;
+    }
+
     static int serverPort(final String[] args) {
-        // TODO: read PORT from environment or as argument
+        Integer port;
+
+        // from env
+        port = intOrNull(System.getenv("PORT"));
+        if (port != null) return port.intValue();
+
+        // from args
+        if (args.length > 0) {
+            port = intOrNull(args[0]);
+            if (port != null) return port.intValue();
+        }
+
         // default to 8080
         return 8080;
     }

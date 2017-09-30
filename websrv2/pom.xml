@@ -9,7 +9,7 @@
 	<packaging>jar</packaging>
 
 	<name>restsrv</name>
-	<description>web server project for webroot </description>
+	<description>web server project for webroot</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -51,7 +51,6 @@
 				</executions>
 			</plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.1.0</version>
                 <executions>
