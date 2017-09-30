@@ -17,6 +17,7 @@
 		<java.version>1.8</java.version>
         <undertow.version>1.4.20.Final</undertow.version>
         <log4j.version>2.9.1</log4j.version>
+        <disruptor.version>3.3.7</disruptor.version>
 	</properties>
 
 	<dependencies>
@@ -29,6 +30,11 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
             <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.lmax</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>${disruptor.version}</version>
         </dependency>
     </dependencies>
 

@@ -19,6 +19,7 @@ public class RestServer {
 
     static { //runs when the main class is loaded.
         System.setProperty("org.jboss.logging.provider", "log4j2");
+        System.setProperty("Log4jContextSelector", "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
     }
 
     private static final Logger LOGGER = Logger.getLogger(RestServer.class);
