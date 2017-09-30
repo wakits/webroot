@@ -17,6 +17,10 @@ import org.jboss.logging.Logger;
  */
 public class RestServer {
 
+    static { //runs when the main class is loaded.
+        System.setProperty("org.jboss.logging.provider", "log4j2");
+    }
+
     private static final Logger LOGGER = Logger.getLogger(RestServer.class);
 
     static Integer intOrNull(String str, String errMsg) {
