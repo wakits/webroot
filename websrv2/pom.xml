@@ -18,6 +18,8 @@
         <undertow.version>1.4.20.Final</undertow.version>
         <log4j.version>2.9.1</log4j.version>
         <disruptor.version>3.3.7</disruptor.version>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
 	</properties>
 
 	<dependencies>
