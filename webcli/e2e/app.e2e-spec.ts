@@ -1,6 +1,6 @@
 import { AppPage } from './app.po';
 
-describe('angular App', () => {
+describe('webcli2 App', () => {
   let page: AppPage;
 
   beforeEach(() => {

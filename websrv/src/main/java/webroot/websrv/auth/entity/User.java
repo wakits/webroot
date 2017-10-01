@@ -9,6 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 
 import org.hibernate.validator.constraints.Email;
 
@@ -18,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity(name = "users")
+@Entity(name = "userw")
 @Data
 @NoArgsConstructor
 public class User implements Serializable {
@@ -29,7 +30,15 @@ public class User implements Serializable {
 
     @NotNull
     @Column(nullable = false, unique = true)
-    private String name;
+    private String firstname;
+
+    @NotNull
+    @Column(nullable = false, unique = true)
+    private String lastname;
+    
+    @NotNull
+    @Column(nullable = false, unique = true)
+    private String username;
 
     @Email
     @Column(nullable = false, unique = true)
@@ -37,22 +46,29 @@ public class User implements Serializable {
 
     @NotNull
     private String password;
+    
+    @Null
+    private String token;
 
     @OneToOne
     @JoinColumn(name = "role_id")
     private Role role;
 
-    public User(String name, String email, String password, Role role) {
-        this.setName(name);
+    public User(String firstName, String lastName, String username, String email, String password, Role role) {
+    		this.setLastname(lastName);
+        this.setFirstname(firstName);
+    		this.setUsername(username);
         this.setEmail(email);
         this.setPassword(password);
         this.setRole(role);
     }
 
-    public User(Long id, String name, String email, String password, Role role) {
-        this(name, email, password, role);
+    public User(Long id, String firstname, String lastname, String username, String email, String password, Role role) {
+        this(firstname, lastname, username, email, password, role);
         this.setId(id);
     }
+    
+    
 
     @JsonIgnore
     public String getPassword() {

@@ -17,8 +17,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import webroot.websrv.auth.entity.Role;
 import webroot.websrv.auth.entity.User;
@@ -30,13 +32,15 @@ import webroot.websrv.auth.security.auth.JwtUser;
 import webroot.websrv.auth.security.auth.JwtUtil;
 import webroot.websrv.auth.service.UserService;
 
+
+@RestController
 public class AuthController extends BaseController {
 
 	@Value("${auth.header}")
 	private String tokenHeader;
 
 	public final static String SIGNUP_URL = "/api/auth/signup";
-	public final static String SIGNIN_URL = "/api/auth/signin";
+	public final static String LOGIN_URL = "/api/auth/login";
 	public final static String REFRESH_TOKEN_URL = "/api/auth/token/refresh";
 
 	private AuthenticationManager authenticationManager;
@@ -105,16 +109,18 @@ public class AuthController extends BaseController {
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtAuthenticationRequest authenticationRequest)
 			throws AuthenticationException {	
 
-		String name = authenticationRequest.getUsername();
+		String lastName = authenticationRequest.getLastname();
+		String firstName = authenticationRequest.getFirstname();
+		String username = authenticationRequest.getUsername();
 		String email = authenticationRequest.getEmail();
 		String password = authenticationRequest.getPassword();
-		LOG.info("[POST] CREATING TOKEN FOR User " + name);
+		LOG.info("[POST] CREATING TOKEN FOR User " + username);
 		Role role = new Role(1L, "USER");
-		userService.save(new User(0L, name, email, password, role));
+		userService.save(new User(0L, firstName,lastName,username, email, password, role));
 		JwtUser userDetails;
 
 		try {
-			userDetails = (JwtUser) userDetailsService.loadUserByUsername(name);
+			userDetails = (JwtUser) userDetailsService.loadUserByUsername(username);
 		} catch (UsernameNotFoundException ex) {
 			LOG.error(ex.getMessage());
 			throw new UserNotFoundException();
@@ -124,7 +130,7 @@ public class AuthController extends BaseController {
 		}
 
 		final Authentication authentication = authenticationManager
-				.authenticate(new UsernamePasswordAuthenticationToken(name, password));
+				.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		final String token = jwtUtil.generateToken(userDetails);
@@ -139,17 +145,18 @@ public class AuthController extends BaseController {
 	 * @return generated JWT
 	 * @throws AuthenticationException
 	 */
-	@PostMapping(SIGNIN_URL)
+	@CrossOrigin
+	@PostMapping(LOGIN_URL)
 	public ResponseEntity getAuthenticationToken(@RequestBody JwtAuthenticationRequest authenticationRequest)
 			throws AuthenticationException {
-
-		String name = authenticationRequest.getUsername();
+		System.out.println("on login server side");
+		String username = authenticationRequest.getUsername();
 		String password = authenticationRequest.getPassword();
-		LOG.info("[POST] GETTING TOKEN FOR User " + name);
+		LOG.info("[POST] GETTING TOKEN FOR User " + username);
 		JwtUser userDetails;
 
 		try {
-			userDetails = (JwtUser) userDetailsService.loadUserByUsername(name);
+			userDetails = (JwtUser) userDetailsService.loadUserByUsername(username);
 		} catch (UsernameNotFoundException | NoResultException ex) {
 			LOG.error(ex.getMessage());
 			throw new UserNotFoundException();
@@ -160,13 +167,21 @@ public class AuthController extends BaseController {
 
 		if (!passwordEncoder().matches(password, userDetails.getPassword())) {
 			throw new InvalidPasswordException();
-		}
+		} 
 
 		final Authentication authentication = authenticationManager
-				.authenticate(new UsernamePasswordAuthenticationToken(name, password));
+				.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
+		
 		final String token = jwtUtil.generateToken(userDetails);
+		
+		//update token on the user
+		
+		userService.updateToken(username,token);
+		
+		LOG.info("[POST] USER TOKEN saved for user " + username);
+		
 		return ResponseEntity.ok(new JwtAuthenticationResponse(token));
 	}
 

@@ -13,5 +13,8 @@ public interface UserService {
   List<User> findAll();
   User findById(Long id);
   User findByEmail(String email);
-  User findByName(String name);
+  User findByUsername(String username);
+  User findUserByToken(String token);
+  List<User> findByAnyName(String name);
+  void updateToken(String username, String token);
 }

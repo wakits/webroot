@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/test
+    username: brunolopes
+    password: 
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      generate-ddl: true
+      hibernate:
+        ddl-auto: drop-create
+        naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        defaultSchema: public
+        hbm2ddl:
+          method: update
+        show_sql: true
+        format_sql: true
+        connection:
+          provider_class: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+    
+

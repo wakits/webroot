@@ -13,15 +13,20 @@ import lombok.EqualsAndHashCode;
 public class JwtUser implements UserDetails {
 
     private final Long id;
-    private final String name;
+    private final String firstname;
+    private final String lastname;
+    private final String username;
     private final String password;
     private final String email;
+    
     private final Collection<? extends GrantedAuthority> authorities;
 
-    public JwtUser(Long id, String name, String email, String password,
+    public JwtUser(Long id, String firstName,String lastName, String username, String email, String password,
                    Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
-        this.name = name;
+        this.firstname = firstName;
+        this.lastname = lastName;
+        this.username = username;
         this.email = email;
         this.password = password;
         this.authorities = authorities;
@@ -33,7 +38,7 @@ public class JwtUser implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.name;
+        return this.username;
     }
 
     @JsonIgnore
@@ -73,15 +78,19 @@ public class JwtUser implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+    
 
     @Override
     public String toString() {
         return "JwtUser{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
+                ", firstname='" + firstname + '\'' +
+                ", lastname='" + lastname + '\'' +
+                ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", email='" + email + '\'' +
                 ", authorities=" + authorities +
                 '}';
     }
+
 }

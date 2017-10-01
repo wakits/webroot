@@ -6,7 +6,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class Controller {
 
-	@RequestMapping("/api/hi")
+	/*
+	 *Is out of the package auth but the mapping is inside /auth, so can be accessible without
+	 *authentication 
+	 */
+	@RequestMapping("/api/auth/hi")
 	public String hi() {
 		return "Hello World from Restful API";
 	}

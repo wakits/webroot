@@ -12,6 +12,8 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 
 import { environment } from '../../../environments/environment';
+import { ApplicationError } from '../../util/applicationerror.service';
+import { error } from 'util';
 
 /**
 * AuthService uses JSON-Web-Token authorization strategy.
@@ -20,15 +22,17 @@ import { environment } from '../../../environments/environment';
 @Injectable()
 export class AuthService {
 
+  public static readonly SIGNUP_URL = environment.apiUrl + '/api/auth/signup';
+  public static readonly LOGIN_URL = environment.apiUrl + '/api/auth/login';
+  public static readonly REFRESH_TOKEN_URL = environment.apiUrl + '/api/auth/token/refresh';
+
   private token: string;
   private username: string;
   private userId: number;
-  
-  public static readonly SIGNUP_URL = environment.apiUrl + "/api/auth/signup";
-  public static readonly SIGNIN_URL = environment.apiUrl + "/api/auth/signin";
-  public static readonly REFRESH_TOKEN_URL = environment.apiUrl + "/api/auth/token/refresh";
-  
-  constructor(private http: Http) {
+
+  constructor(
+    private http: Http) {
+
     this.refreshUserData();
   }
 
@@ -37,7 +41,7 @@ export class AuthService {
   */
   public refreshUserData(): void {
     const user = sessionStorage.getItem('user');
-    if(user) {
+    if (user) {
       this.saveUserDetails(JSON.parse(user));
     }
   }
@@ -54,6 +58,7 @@ export class AuthService {
       email: email,
       username: username,
       password: password
+
     };
 
     return this.http.post(AuthService.SIGNUP_URL, requestParam, this.generateOptions())
@@ -70,20 +75,21 @@ export class AuthService {
   * @param username
   * @param password
   */
-  public signIn(username: string, password: string): Observable<{}> {
+  public login(username: string, password: string): Observable<{}> {
 
     const requestParam = {
       username: username,
       password: password
     };
 
-    return this.http.post(AuthService.SIGNIN_URL, requestParam, this.generateOptions())
-      .map((res: Response) => {
-        this.saveToken(res);
-        this.saveUserDetails(JSON.parse(sessionStorage.getItem('user')));
-      }).catch(err => {
-        throw Error(err.json().message);
-      });
+    const options = this.generateOptions();
+
+    const body = JSON.stringify(requestParam);
+    return this.http
+        .post(AuthService.LOGIN_URL, body, options)
+        .map(this.extractData)
+        .catch(this.handleError);
+
   }
 
   /**
@@ -91,6 +97,7 @@ export class AuthService {
   */
   public logout(): void {
     sessionStorage.removeItem('user');
+    localStorage.removeItem('currentUser');
     this.token = null;
     this.username = null;
     this.userId = null;
@@ -145,7 +152,7 @@ export class AuthService {
     const response = res.json() && res.json().token;
     if (response) {
       const token = response;
-      let claims = this.getTokenClaims(token);
+      const claims = this.getTokenClaims(token);
       claims.token = token;
       sessionStorage.setItem('user', JSON.stringify(claims));
     } else {
@@ -169,11 +176,29 @@ export class AuthService {
 
   // Generates Headers
   private generateOptions(): RequestOptions {
-    let headers = new Headers();
-    headers.append("Content-Type", 'application/json');
-    headers.append("Access-Control-Allow-Origin", "*");
-    headers.append("Access-Control-Allow-Headers", "Origin, Authorization, Content-Type");
+
+    const headers = new Headers({'Content-Type': 'application/json'});
+
     return new RequestOptions({ headers: headers });
   }
 
+    private extractData(res: Response) {
+      const body = res.json();
+        if (body && body.token) {
+
+            return body.token;
+      }
+
+       return {};
+
+    }
+
+    private handleError(erro: any) {
+        const errMsg = (erro.message) ? erro.message :
+            erro.status ? `${erro.status} - ${erro.statusText}` : 'Server error';
+       if (erro.status = '404') {
+         return Observable.throw('user not found.');
+       }
+        return Observable.throw(errMsg);
+    }
 }
