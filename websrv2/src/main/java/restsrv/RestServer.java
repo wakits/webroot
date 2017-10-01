@@ -2,13 +2,14 @@ package restsrv;
 
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
+import io.undertow.server.handlers.GracefulShutdownHandler; 
 import io.undertow.server.handlers.cache.DirectBufferCache;
 import io.undertow.server.handlers.resource.CachingResourceManager;
 import io.undertow.server.handlers.resource.ClassPathResourceManager;
 import io.undertow.server.handlers.resource.ResourceHandler; 
 import io.undertow.server.handlers.resource.ResourceManager;
 
-import java.time.Duration; 
+import java.time.Duration;
 
 import org.jboss.logging.Logger;
 
@@ -22,15 +23,19 @@ public final class RestServer {
         System.setProperty("Log4jContextSelector", "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
     }
     private static final Logger LOGGER = Logger.getLogger(RestServer.class);
+    private static final long HTTP_SHUTDOWN_GRACE_PERIOD_MILLIS = 120000L;     
     private final Undertow server;
+    private final GracefulShutdownHandler shutdownHandler;     
     private final int port;
 
     RestServer(int port) {
         this.port = port;
+        shutdownHandler = new GracefulShutdownHandler(createStaticResourceHandler());
+
         this.server = Undertow
             .builder()
             .addHttpListener(this.port, "localhost")
-            .setHandler(createStaticResourceHandler())
+            .setHandler(shutdownHandler)
             .build();
     }
 
@@ -50,8 +55,26 @@ public final class RestServer {
     }
 
     public void run() {
+        Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
+
         LOGGER.info("Starting RestServer @ localhost:" + this.port);
         server.start();
+    }
+
+    public void shutdown() {
+        try {
+            /* NOTE: For some reason, with the new aync logger active
+                     this message will not reach the log before termination.
+                     So, for now, I'm just printing a message to STDOUT.
+             */
+            LOGGER.info("Stopping HTTP server.");
+            System.out.println("Stopping HTTP server.");
+            shutdownHandler.shutdown(); 
+            shutdownHandler.awaitShutdown(HTTP_SHUTDOWN_GRACE_PERIOD_MILLIS); 
+            server.stop(); 
+        } catch (final Exception ie) { 
+            Thread.currentThread().interrupt(); 
+        }
     }
 
     static int serverPort(final String[] args) {
