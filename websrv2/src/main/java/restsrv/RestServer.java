@@ -15,45 +15,26 @@ import org.jboss.logging.Logger;
 /**
  * RestServer
  */
-public class RestServer {
+public final class RestServer {
 
     static { //runs when the main class is loaded.
         System.setProperty("org.jboss.logging.provider", "log4j2");
         System.setProperty("Log4jContextSelector", "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
     }
-
     private static final Logger LOGGER = Logger.getLogger(RestServer.class);
+    private final Undertow server;
+    private final int port;
 
-    static Integer intOrNull(String str, String errMsg) {
-        if (str == null) return null;
-        try {
-            return Integer.valueOf(str);
-        } catch (NumberFormatException e) {
-            // log error
-            LOGGER.error(errMsg + str);
-        }
-        return null;
+    RestServer(int port) {
+        this.port = port;
+        this.server = Undertow
+            .builder()
+            .addHttpListener(this.port, "localhost")
+            .setHandler(createStaticResourceHandler())
+            .build();
     }
 
-    static int serverPort(final String[] args) {
-        Integer port;
-        String msg = "Invalid port number: ";
-
-        // from env
-        port = intOrNull(System.getenv("PORT"), msg);
-        if (port != null) return port.intValue();
-
-        // from args
-        if (args.length > 0) {
-            port = intOrNull(args[0], msg);
-            if (port != null) return port.intValue();
-        }
-
-        // default to 8080
-        return 8080;
-    }
-
-    static HttpHandler createStaticResourceHandler() {
+    HttpHandler createStaticResourceHandler() {
         final ResourceManager staticResources = new ClassPathResourceManager(RestServer.class.getClassLoader(), "static");
 
         // Cache tuning is copied from Undertow unit tests.
@@ -68,15 +49,41 @@ public class RestServer {
         return resourceHandler;
     }
 
+    public void run() {
+        LOGGER.info("Starting RestServer @ localhost:" + this.port);
+        server.start();
+    }
+
+    static int serverPort(final String[] args) {
+        Integer port;
+        String errMsg = "Invalid port number: ";
+
+        // from env
+        String arg = System.getenv("PORT");
+        if (arg != null) {
+            try {
+                return Integer.parseInt(arg);
+            } catch (NumberFormatException e) {
+                LOGGER.error(errMsg + arg);
+            }
+        }
+
+        // from args
+        if (args.length > 0) {
+            arg = args[0];
+            try {
+                return Integer.parseInt(arg);
+            } catch (NumberFormatException e) {
+                LOGGER.error(errMsg + arg);
+            }
+        }
+
+        // default to 8080
+        return 8080;
+    }
+
     public static void main(final String[] args) {
         int port = serverPort(args);
-
-        Undertow server = Undertow
-            .builder()
-            .addHttpListener(port, "localhost")
-            .setHandler(createStaticResourceHandler())
-            .build();
-        LOGGER.info("Starting RestServer @ localhost:" + port);
-        server.start();
+        new RestServer(port).run();
     }
 }
