@@ -20,6 +20,7 @@
         <disruptor.version>3.3.7</disruptor.version>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
+        <resteasy.version>3.1.4.Final</resteasy.version>
 	</properties>
 
 	<dependencies>
@@ -42,6 +43,11 @@
             <groupId>com.lmax</groupId>
             <artifactId>disruptor</artifactId>
             <version>${disruptor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-undertow</artifactId>
+            <version>${resteasy.version}</version>
         </dependency>
     </dependencies>
 

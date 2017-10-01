@@ -11,12 +11,12 @@ import io.undertow.server.handlers.resource.ResourceHandler;
 import io.undertow.server.handlers.resource.ResourceManager;
 import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.DeploymentInfo;
-import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.servlet.api.ServletContainer;
 
 import java.time.Duration;
-import javax.servlet.ServletException;
 import org.jboss.logging.Logger;
+import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
+import org.jboss.resteasy.spi.ResteasyDeployment;
 
 /**
  * RestServer
@@ -28,8 +28,9 @@ public final class RestServer {
         System.setProperty("Log4jContextSelector", "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
     }
     private static final Logger LOGGER = Logger.getLogger(RestServer.class);
-    private static final long HTTP_SHUTDOWN_GRACE_PERIOD_MILLIS = 120000L;     
-    private final Undertow server;
+    private static final long HTTP_SHUTDOWN_GRACE_PERIOD_MILLIS = 120000L;
+    private final Undertow.Builder builder;
+    private final UndertowJaxrsServer server;
     private final ServletContainer container;
     private final GracefulShutdownHandler shutdownHandler;     
     private final int port;
@@ -38,34 +39,28 @@ public final class RestServer {
         this.port = port;
         this.container = Servlets.defaultContainer();
 
-        shutdownHandler = new GracefulShutdownHandler(createStaticResourceHandler(createServletHandler()));
+        shutdownHandler = new GracefulShutdownHandler(createStaticResourceHandler());
 
-        this.server = Undertow
+        this.builder = Undertow
             .builder()
             .addHttpListener(this.port, "localhost")
-            .setHandler(shutdownHandler)
-            .build();
+            .setHandler(shutdownHandler);
+        
+        this.server = new UndertowJaxrsServer();
+        
+        ResteasyDeployment deployment = new ResteasyDeployment();
+        deployment.setApplicationClass(RestApp.class.getName());
+
+        DeploymentInfo di = server.undertowDeployment(deployment, "/");
+        di.setClassLoader(RestServer.class.getClassLoader())
+            .setContextPath("/api")
+            .setDeploymentName("REST Application");
+        this.server.deploy(di);
+        
+        this.server.addResourcePrefixPath("/", (ResourceHandler)createStaticResourceHandler());
     }
 
-    HttpHandler createServletHandler() {
-        DeploymentInfo di = Servlets.deployment()
-            .setClassLoader(RestServer.class.getClassLoader())
-            .setContextPath("/")
-            .setDeploymentName("REST Server")
-            .addServlets(Servlets.servlet("helloServlet", restsrv.HelloServlet.class)
-                     .addMapping("/hello"));
-
-        DeploymentManager manager = container.addDeployment(di);
-        manager.deploy();
-
-        try {
-            return Handlers.path().addPrefixPath("/", manager.start());
-        } catch (ServletException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    HttpHandler createStaticResourceHandler(HttpHandler next) {
+    HttpHandler createStaticResourceHandler() {
         final ResourceManager staticResources = new ClassPathResourceManager(RestServer.class.getClassLoader(), "static");
 
         // Cache tuning is copied from Undertow unit tests.
@@ -74,7 +69,7 @@ public final class RestServer {
                                            new DirectBufferCache(1024, 10, 10480),
                                            staticResources,
                                            (int)Duration.ofDays(1).getSeconds());
-        final ResourceHandler resourceHandler = new ResourceHandler(cachedResources, next);
+        final ResourceHandler resourceHandler = new ResourceHandler(cachedResources);
         resourceHandler.setWelcomeFiles("index.html");
         resourceHandler.setDirectoryListingEnabled(true);
         return resourceHandler;
@@ -84,7 +79,7 @@ public final class RestServer {
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
 
         LOGGER.info("Starting RestServer @ localhost:" + this.port);
-        server.start();
+        server.start(builder);
     }
 
     public void shutdown() {
@@ -104,7 +99,6 @@ public final class RestServer {
     }
 
     static int serverPort(final String[] args) {
-        Integer port;
         String errMsg = "Invalid port number: ";
 
         // from env
