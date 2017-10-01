@@ -1,5 +1,6 @@
 package restsrv;
 
+import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.GracefulShutdownHandler; 
@@ -8,9 +9,13 @@ import io.undertow.server.handlers.resource.CachingResourceManager;
 import io.undertow.server.handlers.resource.ClassPathResourceManager;
 import io.undertow.server.handlers.resource.ResourceHandler; 
 import io.undertow.server.handlers.resource.ResourceManager;
+import io.undertow.servlet.Servlets;
+import io.undertow.servlet.api.DeploymentInfo;
+import io.undertow.servlet.api.DeploymentManager;
+import io.undertow.servlet.api.ServletContainer;
 
 import java.time.Duration;
-
+import javax.servlet.ServletException;
 import org.jboss.logging.Logger;
 
 /**
@@ -25,12 +30,15 @@ public final class RestServer {
     private static final Logger LOGGER = Logger.getLogger(RestServer.class);
     private static final long HTTP_SHUTDOWN_GRACE_PERIOD_MILLIS = 120000L;     
     private final Undertow server;
+    private final ServletContainer container;
     private final GracefulShutdownHandler shutdownHandler;     
     private final int port;
 
     RestServer(int port) {
         this.port = port;
-        shutdownHandler = new GracefulShutdownHandler(createStaticResourceHandler());
+        this.container = Servlets.defaultContainer();
+
+        shutdownHandler = new GracefulShutdownHandler(createStaticResourceHandler(createServletHandler()));
 
         this.server = Undertow
             .builder()
@@ -39,7 +47,25 @@ public final class RestServer {
             .build();
     }
 
-    HttpHandler createStaticResourceHandler() {
+    HttpHandler createServletHandler() {
+        DeploymentInfo di = Servlets.deployment()
+            .setClassLoader(RestServer.class.getClassLoader())
+            .setContextPath("/")
+            .setDeploymentName("REST Server")
+            .addServlets(Servlets.servlet("helloServlet", restsrv.HelloServlet.class)
+                     .addMapping("/hello"));
+
+        DeploymentManager manager = container.addDeployment(di);
+        manager.deploy();
+
+        try {
+            return Handlers.path().addPrefixPath("/", manager.start());
+        } catch (ServletException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    HttpHandler createStaticResourceHandler(HttpHandler next) {
         final ResourceManager staticResources = new ClassPathResourceManager(RestServer.class.getClassLoader(), "static");
 
         // Cache tuning is copied from Undertow unit tests.
@@ -48,7 +74,7 @@ public final class RestServer {
                                            new DirectBufferCache(1024, 10, 10480),
                                            staticResources,
                                            (int)Duration.ofDays(1).getSeconds());
-        final ResourceHandler resourceHandler = new ResourceHandler(cachedResources);
+        final ResourceHandler resourceHandler = new ResourceHandler(cachedResources, next);
         resourceHandler.setWelcomeFiles("index.html");
         resourceHandler.setDirectoryListingEnabled(true);
         return resourceHandler;
