@@ -10,7 +10,7 @@ public class Controller {
 	 *Is out of the package auth but the mapping is inside /auth, so can be accessible without
 	 *authentication 
 	 */
-	@RequestMapping("/api/auth/hi")
+	@RequestMapping("/api/hi")
 	public String hi() {
 		return "Hello World from Restful API";
 	}
