@@ -25,3 +25,23 @@ Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protrac
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+
+## start webcli https
+ng serve --ssl 1 --ssl-key certificate/key.pem --ssl-cert certificate/cert.pem
+environment.ts changed to https on port 8443
+to gen certificates
+> openssl genrsa -out key.pem 1024
+> openssl req -newkey rsa:1024 -new -key key.pem -out csr.pem
+> openssl x509 -req -days 9999 -in csr.pem -signkey key.pem -out cert.pem
+
+## start websrv https
+keytool -genkey -alias tomcat -storetype PKCS12 -keyalg RSA -keysize 2048 -keystore keystore.p12 -validity 3650
+keeps same port:4200
+updated application.yml with:
+server:
+  port: 8443
+  ssl:
+    key-store: keystore.p12
+    key-store-password: ******
+    keyStoreType: PKCS12
+    

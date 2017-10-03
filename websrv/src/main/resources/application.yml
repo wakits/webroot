@@ -25,3 +25,13 @@ auth:
   expires: 604800
   header: Authorization 
 
+# keytool -genkey -alias tomcat -storetype PKCS12 -keyalg RSA -keysize 2048 -keystore keystore.p12 -validity 3650
+
+server:
+  port: 8443
+  ssl:
+    key-store: keystore.p12
+    key-store-password: xe4vvhv9
+    keyStoreType: PKCS12
+    keyAlias: tomcat
+    
