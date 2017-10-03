@@ -18,5 +18,10 @@ spring:
         format_sql: true
         connection:
           provider_class: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
-    
+
+# JWT Auth
+auth:
+  secret: some-random-secret
+  expires: 604800
+  header: Authorization 
 
