@@ -50,11 +50,13 @@ public final class RestServer {
         
         ResteasyDeployment deployment = new ResteasyDeployment();
         deployment.setApplicationClass(RestApp.class.getName());
+        deployment.setInjectorFactoryClass("org.jboss.resteasy.cdi.CdiInjectorFactory");
 
         DeploymentInfo di = server.undertowDeployment(deployment, "/");
         di.setClassLoader(RestServer.class.getClassLoader())
             .setContextPath("/api")
-            .setDeploymentName("REST Application");
+            .setDeploymentName("REST Application")
+            .addListeners(Servlets.listener(org.jboss.weld.environment.servlet.Listener.class));
         this.server.deploy(di);
         
         this.server.addResourcePrefixPath("/", (ResourceHandler)createStaticResourceHandler());
