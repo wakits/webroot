@@ -28,16 +28,16 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 ## start webcli https
 ng serve --ssl 1 --ssl-key certificate/key.pem --ssl-cert certificate/cert.pem
-environment.ts changed to https on port 8443
-to gen certificates
+- environment.ts changed to https on port 8443
+- to gen certificates
 > openssl genrsa -out key.pem 1024
 > openssl req -newkey rsa:1024 -new -key key.pem -out csr.pem
 > openssl x509 -req -days 9999 -in csr.pem -signkey key.pem -out cert.pem
 
 ## start websrv https
 keytool -genkey -alias tomcat -storetype PKCS12 -keyalg RSA -keysize 2048 -keystore keystore.p12 -validity 3650
-keeps same port:4200
-updated application.yml with:
+- keeps same port for client:4200
+- updated application.yml with:
 server:
   port: 8443
   ssl:
@@ -45,3 +45,10 @@ server:
     key-store-password: ******
     keyStoreType: PKCS12
     
+## install sass and compass for styling 
+gem install ruby
+gem install sass --no-ri --no-rdoc
+gem install compass --no-ri --no-rdoc 
+
+## make webcli / angular using scss
+ng set defaults.styleExt scss

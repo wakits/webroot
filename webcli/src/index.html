@@ -1,20 +1,74 @@
 <!doctype html>
 <html>
 <head>
-  <title>App title</title>
+  <title>Webroot</title>
   <base href="/">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <link rel="shortcut icon" type="image/png" href="assets/images/favicon.png" />
-  <link rel="manifest" href="assets/manifest.json" />
-  <link rel="stylesheet"  href="assets/css/bootstrap.min.css">
+
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
+  
+  <link href="https://fonts.googleapis.com/css?family=Saira+Semi+Condensed:200" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Architects+Daughter|Gloria+Hallelujah|Indie+Flower|Permanent+Marker|Satisfy|Shadows+Into+Light" rel="stylesheet"> 
+ 
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/swiper.min.css">
+  <link href="assets/css/jqvmap.min.css" media="screen" rel="stylesheet" type="text/css"/>
+      
+  <script src="assets/js/jquery-3.2.1.min.js" type="text/javascript"></script>
+<!--   <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.3.min.js"></script> -->
+   
 </head>
-<body>
+<body style="background:#F0F0F0;height:0px;" data-spy="scroll" data-target=".navbar" data-offset="50">
+  <script src="assets/js/jssor.slider-26.3.0.min.js" type="text/javascript"></script>
+  <script type="text/javascript">
+  
+  $(document).ready(function() {
+
+  $('<script/>',{type:'text/javascript', src:'assets/js/jquery.vmap.js'}).appendTo('head');
+  $('<script/>',{type:'text/javascript', src:'assets/js/jquery.vmap.world.js'}).appendTo('head');
+  $('<script/>',{type:'text/javascript', src:'assets/js/jquery.vmap.sampledata.js'}).appendTo('head');
+	  
+  
+  jQuery.fn.extend({
+		  
+		  testf: function(){
+	  		console.log('on testf');
+  		  }
+  });
+	$('#testModal').click(function(){
+	 	  $('#myModal').modal('show');
+	});
+		 
+	    setTimeout(function(){
+	        $('body').addClass('loaded');
+// 	        $('h1').css('color','#222222');
+	    }, 3000);
+	 
+	    jQuery('#vmap').vectorMap({
+        map: 'world_en',
+        backgroundColor: '#333333',
+        color: '#ffffff',
+        hoverOpacity: 0.7,
+        selectedColor: '#666666',
+        enableZoom: true,
+        showTooltip: true,
+        scaleColors: ['#C8EEFF', '#006491'],
+        values: sample_data,
+        normalizeFunction: 'polynomial'
+      });
+	  
+    });
+  	
+  </script>
   <app-root>
     <div class="loader">Loading...</div>
   </app-root>
   <script>
+  
+	
 //   if ('serviceWorker' in navigator) {
 // 	  window.addEventListener('load', function() {
 // 	    navigator.serviceWorker.register('/sw.js').then(function(registration) {
@@ -26,6 +80,13 @@
 // 	    });
 // 	  });
 // 	}
-  </script>
+
+</script>
+
+<!--   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> -->
+	<script src="assets/js/swiper.min.js"></script>
+  <script src="assets/js/webroot.js" type="text/javascript"></script>
+  
+  
 </body>
 </html> 

@@ -1,6 +1,7 @@
 import { environment } from '../../../../environments/environment';
 import { User } from '../../../models/user.model';
 import { LoggerService } from '../../../util/logger.service';
+import { AuthService } from '../auth.service';
 import { Injectable } from '@angular/core';
 import { Jsonp, Http, RequestOptions } from '@angular/http';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
@@ -15,7 +16,8 @@ export class UserService {
   private user: User = null;
 
   constructor(private http: HttpClient,
-    private logger: LoggerService) { }
+    private logger: LoggerService,
+    private authService: AuthService) { }
 
   public getAllUsers(filter: String): Observable<User[]> {
     const endPoint = UserService.LIST_USERS_ENDPOINT + 'list?name=' + filter;
@@ -55,8 +57,10 @@ export class UserService {
 
     public signup(user: User) {
       console.log(user);
-      const endPoint = UserService.SIGNUP_ENDPOINT;
-        return this.http.post(endPoint, user).map((response: Response) => response);
+      return this.authService.signUp(user);
+//      const endPoint = UserService.SIGNUP_ENDPOINT;
+//        return this.http.post(endPoint, user)
+//          .map((response: Response) => response);
     }
 
     update(user: User) {

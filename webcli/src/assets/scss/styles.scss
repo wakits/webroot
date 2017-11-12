@@ -1,0 +1,22 @@
+@import "compass";
+
+// include the compass spite utility if not already included
+@import "compass/utilities/sprites";
+
+// import your images
+// note: compass already knows my images live in the /images/ folder
+@import "icons/*png";
+
+// automagically generate class names
+@include all-icons-sprites;
+
+// making use of width/height magic selectors
+.icon-giant-killer-bear {
+  $width: icons-sprite-width(giant-killer-bear);
+  $height: icons-sprite-height(giant-killer-bear);
+  @include icons-sprite(giant-killer-bear);
+  @include size($width, $height);
+  margin: 0 4px 0 0;
+  vertical-align: text-bottom;
+}
+

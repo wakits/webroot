@@ -16,7 +16,9 @@ import { AlertService } from './services/alert/alert.service';
 import { GuardService } from './services/auth/guard/guard.service';
 import { UserService } from './services/auth/user/user.service';
 import { LoggerService } from './util/logger.service';
-
+import { UtilService } from './util/util.service';
+import { EntryComponent } from './component/entry/entry.component';
+import { AlertModule } from 'ngx-bootstrap';
 
 @NgModule({
   declarations: [
@@ -24,7 +26,8 @@ import { LoggerService } from './util/logger.service';
     AlertComponent,
     HomeComponent,
     LoginComponent,
-    RegisterComponent
+    RegisterComponent,
+    EntryComponent
   ],
   imports: [
     BrowserModule,
@@ -32,9 +35,7 @@ import { LoggerService } from './util/logger.service';
     HttpModule,
     HttpClientModule,
     routing,
-    RouterModule.forRoot([
-      {path: '**/*', component: AppComponent},
-    ])
+    AlertModule.forRoot()
   ],
   providers: [
     AuthService,
@@ -42,7 +43,8 @@ import { LoggerService } from './util/logger.service';
     AlertService,
     UserService,
     LoggerService,
-    BaseRequestOptions
+    BaseRequestOptions,
+    UtilService
   ],
   bootstrap: [
     AppComponent

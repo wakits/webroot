@@ -1,1 +1,13 @@
-/* You can add global styles to this file, and also import other style files */
+.signup-btn {
+     background-color: #00FF00;
+     border: 0;
+     color: #000000;
+     padding: 10px 20px; 
+}
+
+.signup-btn:hover {
+     background: #FF0000;
+     color: #FFFFFF;
+     text-decoration: none;  
+}
+

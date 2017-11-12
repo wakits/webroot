@@ -19,9 +19,17 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "app",
       "styles": [
-        "styles.css"
+	"../node_modules/bootstrap/dist/css/bootstrap.min.css",
+        "../node_modules/bootstrap/dist/css/bootstrap-theme.min.css",
+        "styles.css",
+	"assets/css/reset.min.css"
       ],
-      "scripts": [],
+      "scripts": [
+	"assets/js/bootstrap.min.js",
+	"assets/js/jquery-3.2.1.min.js",
+	"assets/js/vue.min.js",
+	"assets/js/swiper.min.js"
+	],
       "environmentSource": "environments/environment.ts",
       "environments": {
         "dev": "environments/environment.ts",
@@ -55,6 +63,7 @@
   },
   "defaults": {
     "styleExt": "css",
-    "component": {}
+    "component": {
+    }
   }
 }

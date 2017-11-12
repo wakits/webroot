@@ -12,7 +12,9 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 
 import { environment } from '../../../environments/environment';
+import { User } from '../../models/user.model';
 import { ApplicationError } from '../../util/applicationerror.service';
+import { UtilService } from '../../util/util.service';
 import { error } from 'util';
 
 /**
@@ -31,7 +33,8 @@ export class AuthService {
   private userId: number;
 
   constructor(
-    private http: Http) {
+    private http: Http,
+    private utilService: UtilService) {
 
     this.refreshUserData();
   }
@@ -52,21 +55,15 @@ export class AuthService {
   * @param email
   * @param password
   */
-  public signUp(username: string, email: string, password: string): Observable<{}> {
+  public signUp(user: User): Observable<{}> {
 
-    const requestParam = {
-      email: email,
-      username: username,
-      password: password
-
-    };
-
-    return this.http.post(AuthService.SIGNUP_URL, requestParam, this.generateOptions())
+    return this.http.post(AuthService.SIGNUP_URL, user, this.generateOptions())
       .map((res: Response) => {
         this.saveToken(res);
         this.saveUserDetails(JSON.parse(sessionStorage.getItem('user')));
+        console.log(res.status);
       }).catch(err => {
-        throw Error(err.json().message);
+        return this.utilService.hanldeHttpError(err, 'user');
       });
   }
 
@@ -88,9 +85,10 @@ export class AuthService {
     return this.http
         .post(AuthService.LOGIN_URL, body, options)
         .map(this.extractData)
-        .catch(this.handleError);
-
-  }
+        .catch(err => {
+         return this.utilService.hanldeHttpError(err, 'user');
+        });
+}
 
   /**
   * Removes token and user details from sessionStorage and service's variables
@@ -193,12 +191,4 @@ export class AuthService {
 
     }
 
-    private handleError(erro: any) {
-        const errMsg = (erro.message) ? erro.message :
-            erro.status ? `${erro.status} - ${erro.statusText}` : 'Server error';
-       if (erro.status = '404') {
-         return Observable.throw('user not found.');
-       }
-        return Observable.throw(errMsg);
-    }
 }
